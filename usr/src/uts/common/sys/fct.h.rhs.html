@@ -1,0 +1,591 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="cache-control" content="no-cache"></meta>
+<meta http-equiv="Pragma" content="no-cache"></meta>
+<meta http-equiv="Expires" content="-1"></meta>
+<!--
+   Note to customizers: the body of the webrev is IDed as SUNWwebrev
+   to allow easy overriding by users of webrev via the userContent.css
+   mechanism available in some browsers.
+
+   For example, to have all "removed" information be red instead of
+   brown, set a rule in your userContent.css file like:
+
+       body#SUNWwebrev span.removed { color: red ! important; }
+-->
+<style type="text/css" media="screen">
+body {
+    background-color: #eeeeee;
+}
+hr {
+    border: none 0;
+    border-top: 1px solid #aaa;
+    height: 1px;
+}
+div.summary {
+    font-size: .8em;
+    border-bottom: 1px solid #aaa;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+div.summary h2 {
+    margin-bottom: 0.3em;
+}
+div.summary table th {
+    text-align: right;
+    vertical-align: top;
+    white-space: nowrap;
+}
+span.lineschanged {
+    font-size: 0.7em;
+}
+span.oldmarker {
+    color: red;
+    font-size: large;
+    font-weight: bold;
+}
+span.newmarker {
+    color: green;
+    font-size: large;
+    font-weight: bold;
+}
+span.removed {
+    color: brown;
+}
+span.changed {
+    color: blue;
+}
+span.new {
+    color: blue;
+    font-weight: bold;
+}
+span.chmod {
+    font-size: 0.7em;
+    color: #db7800;
+}
+a.print { font-size: x-small; }
+a:hover { background-color: #ffcc99; }
+</style>
+
+<style type="text/css" media="print">
+pre { font-size: 0.8em; font-family: courier, monospace; }
+span.removed { color: #444; font-style: italic }
+span.changed { font-weight: bold; }
+span.new { font-weight: bold; }
+span.newmarker { font-size: 1.2em; font-weight: bold; }
+span.oldmarker { font-size: 1.2em; font-weight: bold; }
+a.print {display: none}
+hr { border: none 0; border-top: 1px solid #aaa; height: 1px; }
+</style>
+
+    <script type="text/javascript" src="../../../../../ancnav.js"></script>
+    </head>
+    <body id="SUNWwebrev" onkeypress="keypress(event);">
+    <a name="0"></a>
+    <pre>*** NO COMMENTS ***</pre><hr></hr>
+<pre>
+   1 /*
+   2  * CDDL HEADER START
+   3  *
+   4  * The contents of this file are subject to the terms of the
+   5  * Common Development and Distribution License (the "License").
+   6  * You may not use this file except in compliance with the License.
+   7  *
+   8  * You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+   9  * or http://www.opensolaris.org/os/licensing.
+  10  * See the License for the specific language governing permissions
+  11  * and limitations under the License.
+  12  *
+  13  * When distributing Covered Code, include this CDDL HEADER in each
+  14  * file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+  15  * If applicable, add the following below this CDDL HEADER, with the
+  16  * fields enclosed by brackets "[]" replaced with your own identifying
+  17  * information: Portions Copyright [yyyy] [name of copyright owner]
+  18  *
+  19  * CDDL HEADER END
+  20  */
+  21 /*
+  22  * Copyright (c) 2008, 2010, Oracle and/or its affiliates. All rights reserved.
+  23  */
+  24 #ifndef _FCT_H
+  25 #define _FCT_H
+  26 
+  27 /*
+  28  * Definitions for common FC Target.
+  29  */
+  30 #include &lt;sys/note.h&gt;
+  31 #include &lt;sys/stmf_defines.h&gt;
+  32 #include &lt;sys/fct_defines.h&gt;
+  33 #include &lt;sys/portif.h&gt;
+  34 
+  35 #ifdef  __cplusplus
+  36 extern "C" {
+  37 #endif
+  38 
+  39 typedef enum fct_struct_id {
+  40         FCT_STRUCT_LOCAL_PORT = 1,
+  41         FCT_STRUCT_REMOTE_PORT,
+  42         FCT_STRUCT_CMD_RCVD_ELS,
+  43         FCT_STRUCT_CMD_SOL_ELS,
+  44         FCT_STRUCT_CMD_SOL_CT,
+  45         FCT_STRUCT_CMD_RCVD_ABTS,
+  46         FCT_STRUCT_CMD_FCP_XCHG,
+  47         FCT_STRUCT_DBUF_STORE,
+  48 
+  49         FCT_MAX_STRUCT_IDS
+  50 } fct_struct_id_t;
+  51 
+  52 typedef struct fct_remote_port {
+  53         void            *rp_fct_private;
+  54         void            *rp_fca_private;
+  55 
+  56         struct fct_local_port *rp_port;
+  57         char            rp_nwwn_str[FC_WWN_BUFLEN];
+  58         char            rp_pwwn_str[FC_WWN_BUFLEN];
+  59         uint8_t         rp_nwwn[FC_WWN_LEN];
+  60         uint8_t         rp_pwwn[FC_WWN_LEN];
+  61         uint32_t        rp_id;          /* 8 or 24 bit */
+  62         uint32_t        rp_hard_address;
+  63         uint16_t        rp_handle;
+  64 } fct_remote_port_t;
+  65 
+  66 #define FCT_HANDLE_NONE 0xffff
+  67 
+  68 typedef struct fct_cmd {
+  69         void            *cmd_fct_private;
+  70         void            *cmd_fca_private;
+  71         void            *cmd_specific;
+  72 
+  73         struct fct_local_port   *cmd_port;
+  74 
+  75         /* During cmd porting this can be set to NULL */
+  76         struct fct_remote_port  *cmd_rp;
+  77 
+  78         /* To link cmds together for handling things like ABTS. */
+  79         struct fct_cmd  *cmd_link;
+  80         uint8_t         cmd_type;
+  81         uint8_t         cmd_rsvd1;
+  82 
+  83         /* During cmd posting this can be set to FCT_HANDLE_NONE */
+  84         uint16_t        cmd_rp_handle;
+  85         uint32_t        cmd_handle;
+  86         uint32_t        cmd_rportid;
+  87         uint32_t        cmd_lportid;
+  88         uint32_t        cmd_rsvd2;
+  89         uint16_t        cmd_oxid;
+  90         uint16_t        cmd_rxid;
+  91         fct_status_t    cmd_comp_status;
+  92 } fct_cmd_t;
+  93 
+  94 /*
+  95  * fcmd_cmd_handle: Bit definitions.
+  96  *   31           23           15           7          0
+  97  *  +--------------+------------+------------+------------+
+  98  *  | V |uniq_cntr |fca specific|   cmd slot index        |
+  99  *  +--------------+------------+------------+------------+
+ 100  * V = handle valid.
+ 101  */
+ 102 #define CMD_HANDLE_SLOT_INDEX(x)        ((x) &amp; 0xffff)
+ 103 #define CMD_HANDLE_VALID(x)             ((x) &amp; 0x80000000)
+ 104 
+ 105 enum fct_cmd_types {
+ 106         FCT_CMD_FCP_XCHG =      0x0001,
+ 107         FCT_CMD_RCVD_ELS =      0x0002,
+ 108         FCT_CMD_SOL_ELS =       0x0004,
+ 109         FCT_CMD_RCVD_ABTS =     0x0008,
+ 110         FCT_CMD_SOL_CT =        0x0010,
+ 111 
+ 112         FCT_CMD_TYPE_ALL =      0xffff
+ 113 };
+ 114 
+ 115 typedef struct fct_els {
+ 116         uint16_t        els_req_size;
+ 117         uint16_t        els_resp_size;
+ 118         uint16_t        els_req_alloc_size;
+ 119         uint16_t        els_resp_alloc_size;
+ 120         uint8_t         *els_req_payload;
+ 121         uint8_t         *els_resp_payload;
+ 122 } fct_els_t;
+ 123 
+ 124 typedef struct fct_sol_ct {
+ 125         uint16_t        ct_req_size;
+ 126         uint16_t        ct_resp_size;
+ 127         uint16_t        ct_req_alloc_size;
+ 128         uint16_t        ct_resp_alloc_size;
+ 129         uint8_t         *ct_req_payload;
+ 130         uint8_t         *ct_resp_payload;
+ 131 } fct_sol_ct_t;
+ 132 
+ 133 typedef struct fct_rcvd_abts {
+ 134         uint8_t         abts_resp_rctl; /* Can be BA_ACC or BA_RJT */
+ 135         uint8_t         abts_state;
+ 136         uint16_t        rsvd;
+ 137         uint8_t         abts_resp_payload[12];
+ 138 } fct_rcvd_abts_t;
+ 139 
+ 140 /*
+ 141  * abts state
+ 142  */
+ 143 #define ABTS_STATE_RECEIVED             0
+ 144 #define ABTS_STATE_RESPONDED            1
+ 145 #define ABTS_STATE_COMPLETED            2
+ 146 #define ABTS_STATE_ABORT_REQUESTED      3
+ 147 #define ABTS_STATE_ABORT_COMPLETED      4
+ 148 
+ 149 #define FCHBA_MANUFACTURER_LEN          64
+ 150 #define FCHBA_SERIAL_NUMBER_LEN         64
+ 151 #define FCHBA_MODEL_LEN                 256
+ 152 #define FCHBA_MODEL_DESCRIPTION_LEN     256
+ 153 #define FCHBA_HARDWARE_VERSION_LEN      256
+ 154 #define FCHBA_DRIVER_VERSION_LEN        256
+ 155 #define FCHBA_OPTION_ROM_VERSION_LEN    256
+ 156 #define FCHBA_FIRMWARE_VERSION_LEN      256
+ 157 #define FCHBA_DRIVER_NAME_LEN           256
+ 158 #define FCHBA_SYMB_NAME_LEN             255
+ 159 
+ 160 #define FCT_INFO_LEN                    160
+ 161 #define FCT_TASKQ_NAME_LEN              24
+ 162 
+ 163 #define FC_TGT_PORT_INFO_CMD            (((uint32_t)'I') &lt;&lt; 24)
+ 164 #define FC_TGT_PORT_RLS                 FC_TGT_PORT_INFO_CMD + 0x1
+ 165 
+ 166 typedef struct fct_port_attrs {
+ 167         char            manufacturer[FCHBA_MANUFACTURER_LEN];
+ 168         char            serial_number[FCHBA_SERIAL_NUMBER_LEN];
+ 169         char            model[FCHBA_MODEL_LEN];
+ 170         char            model_description[FCHBA_MODEL_DESCRIPTION_LEN];
+ 171         char            hardware_version[FCHBA_HARDWARE_VERSION_LEN];
+ 172         char            driver_version[FCHBA_DRIVER_VERSION_LEN];
+ 173         char            option_rom_version[FCHBA_OPTION_ROM_VERSION_LEN];
+ 174         char            firmware_version[FCHBA_FIRMWARE_VERSION_LEN];
+ 175         char            driver_name[FCHBA_DRIVER_NAME_LEN];
+ 176         uint32_t        vendor_specific_id;
+ 177         uint32_t        supported_cos;
+ 178         uint32_t        supported_speed;
+ 179         uint32_t        max_frame_size;
+ 180 } fct_port_attrs_t;
+ 181 
+ 182 typedef struct fct_port_link_status {
+ 183         uint32_t        LinkFailureCount;
+ 184         uint32_t        LossOfSyncCount;
+ 185         uint32_t        LossOfSignalsCount;
+ 186         uint32_t        PrimitiveSeqProtocolErrorCount;
+ 187         uint32_t        InvalidTransmissionWordCount;
+ 188         uint32_t        InvalidCRCCount;
+ 189 } fct_port_link_status_t;
+ 190 
+ 191 typedef struct fct_dbuf_store {
+ 192         void                    *fds_fct_private;
+ 193         void                    *fds_fca_private;
+ 194         struct stmf_dbuf_store  *fds_ds;
+ 195 
+ 196         stmf_data_buf_t *(*fds_alloc_data_buf)(struct fct_local_port *port,
+ 197                             uint32_t size, uint32_t *pminsize, uint32_t flags);
+ 198         void            (*fds_free_data_buf)(struct fct_dbuf_store *fds,
+ 199                             stmf_data_buf_t *dbuf);
+ 200         stmf_status_t   (*fds_setup_dbuf)(struct fct_local_port *port,
+ 201                             stmf_data_buf_t *dbuf, uint32_t flags);
+ 202         void            (*fds_teardown_dbuf)(struct fct_dbuf_store *fds,
+ 203                             stmf_data_buf_t *dbuf);
+ 204 
+ 205         uint32_t                fds_max_sgl_xfer_len;
+ 206         uint32_t                fds_copy_threshold;
+ 207 } fct_dbuf_store_t;
+ 208 
+ 209 #define FCT_FCA_MODREV_1        1
+ 210 
+ 211 typedef struct fct_local_port {
+ 212         void                    *port_fct_private;
+ 213         void                    *port_fca_private;
+ 214         stmf_local_port_t       *port_lport;
+ 215 
+ 216         char                    port_nwwn_str[FC_WWN_BUFLEN];
+ 217         char                    port_pwwn_str[FC_WWN_BUFLEN];
+ 218         uint8_t                 port_nwwn[FC_WWN_LEN];
+ 219         uint8_t                 port_pwwn[FC_WWN_LEN];
+ 220         char                    *port_default_alias;
+ 221         char                    *port_sym_node_name;
+ 222         char                    *port_sym_port_name;
+ 223 
+ 224         stmf_port_provider_t    *port_pp;
+ 225 
+ 226         uint32_t                port_hard_address;
+ 227         uint16_t                port_max_logins;
+ 228         uint16_t                port_max_xchges;
+ 229         uint32_t                port_fca_fcp_cmd_size;
+ 230         uint32_t                port_fca_rp_private_size;
+ 231         uint32_t                port_fca_sol_els_private_size;
+ 232         uint32_t                port_fca_sol_ct_private_size;
+ 233 
+ 234         /* in milliseconds */
+ 235         uint32_t                port_fca_abort_timeout;
+ 236 
+ 237         fct_dbuf_store_t        *port_fds;
+ 238         fct_status_t            (*port_get_link_info)(
+ 239                 struct fct_local_port *port, struct fct_link_info *li);
+ 240         fct_status_t            (*port_register_remote_port)(
+ 241                 struct fct_local_port *port, struct fct_remote_port *rp,
+ 242                 struct fct_cmd *login_els);
+ 243         fct_status_t            (*port_deregister_remote_port)(
+ 244                 struct fct_local_port *port, struct fct_remote_port *rp);
+ 245         fct_status_t            (*port_send_cmd)(fct_cmd_t *cmd);
+ 246         fct_status_t            (*port_xfer_scsi_data)(fct_cmd_t *cmd,
+ 247                         stmf_data_buf_t *dbuf, uint32_t flags);
+ 248         fct_status_t            (*port_send_cmd_response)(fct_cmd_t *cmd,
+ 249                                         uint32_t ioflags);
+ 250         fct_status_t            (*port_abort_cmd)(struct fct_local_port *port,
+ 251                         fct_cmd_t *cmd, uint32_t flags);
+ 252         void                    (*port_ctl)(struct fct_local_port *port,
+ 253                                                 int cmd, void *arg);
+ 254         fct_status_t            (*port_flogi_xchg)(struct fct_local_port *port,
+ 255                         struct fct_flogi_xchg *fx);
+ 256         void                    (*port_populate_hba_details)(
+ 257                 struct fct_local_port *port, struct fct_port_attrs *port_attrs);
+ 258         fct_status_t            (*port_info)(uint32_t cmd,
+ 259                 struct fct_local_port *port, void *arg, uint8_t *buf,
+ 260                 uint32_t *bufsizep);
+ 261         int             port_fca_version;
+ 262 } fct_local_port_t;
+ 263 
+ 264 /*
+ 265  * Common struct used during FLOGI exchange.
+ 266  */
+ 267 typedef struct fct_flogi_xchg {
+ 268         uint8_t         fx_op;          /* ELS_OP_FLOGI or ELS_OP_ACC/RJT */
+ 269         uint8_t         fx_rjt_reason;
+ 270         uint8_t         fx_rjt_expl;
+ 271         uint8_t         fx_sec_timeout; /* Timeout in seconds */
+ 272         uint32_t        fx_fport:1,     /* 0=N_port, 1=F_port */
+ 273                         rsvd2:31;
+ 274         uint32_t        fx_sid;         /* 24 bit SID to use */
+ 275         uint32_t        fx_did;         /* 24 bit DID to use */
+ 276         uint8_t         fx_pwwn[8];
+ 277         uint8_t         fx_nwwn[8];
+ 278 } fct_flogi_xchg_t;
+ 279 
+ 280 typedef struct fct_link_info {
+ 281         uint32_t                portid;
+ 282         uint8_t                 port_topology;
+ 283         uint8_t                 port_speed;
+ 284 
+ 285         uint8_t                 rsvd:5,
+ 286 
+ 287         /*
+ 288          * FCA sets this bit to indicate that fct does not need to do FLOGI
+ 289          * because either FCA did the FLOGI or it determined that its a private
+ 290          * loop. Setting this bit by FCA is optional.
+ 291          */
+ 292                                 port_no_fct_flogi:1,
+ 293 
+ 294         /* FCA sets this bit to indicate that it did FLOGI */
+ 295                                 port_fca_flogi_done:1,
+ 296 
+ 297         /* FCT sets this bit to indicate that it did FLOGI */
+ 298                                 port_fct_flogi_done:1;
+ 299 
+ 300         uint8_t                 rsvd1;
+ 301 
+ 302         /* The fields below are only valid if someone did a successful flogi */
+ 303         uint8_t                 port_rnwwn[8];
+ 304         uint8_t                 port_rpwwn[8];
+ 305 } fct_link_info_t;
+ 306 
+ 307 typedef struct fct_port_stat {
+ 308         kstat_named_t   link_failure_cnt;
+ 309         kstat_named_t   loss_of_sync_cnt;
+ 310         kstat_named_t   loss_of_signals_cnt;
+ 311         kstat_named_t   prim_seq_protocol_err_cnt;
+ 312         kstat_named_t   invalid_tx_word_cnt;
+ 313         kstat_named_t   invalid_crc_cnt;
+ 314 } fct_port_stat_t;
+ 315 
+ 316 /*
+ 317  * port topology
+ 318  */
+ 319 #define PORT_TOPOLOGY_UNKNOWN           0
+ 320 #define PORT_TOPOLOGY_PT_TO_PT          1
+ 321 #define PORT_TOPOLOGY_PRIVATE_LOOP      2
+ 322 #define PORT_TOPOLOGY_PUBLIC_LOOP       6
+ 323 #define PORT_TOPOLOGY_FABRIC_PT_TO_PT   5
+ 324 #define PORT_TOPOLOGY_FABRIC_BIT        4
+ 325 
+ 326 #define PORT_FLOGI_DONE(li)     (((li)-&gt;port_fca_flogi_done) || \
+ 327                                         ((li)-&gt;port_fct_flogi_done))
+ 328 
+ 329 /*
+ 330  * port speed
+ 331  */
+ 332 #define PORT_SPEED_UNKNOWN              0
+ 333 #define PORT_SPEED_1G                   1
+ 334 #define PORT_SPEED_2G                   2
+ 335 #define PORT_SPEED_4G                   4
+ 336 #define PORT_SPEED_8G                   8
+ 337 #define PORT_SPEED_10G                  16
+ 338 
+ 339 /*
+ 340  * Abort commands
+ 341  */
+ 342 #define FCT_TERMINATE_CMD               1
+ 343 
+ 344 /*
+ 345  * FCT port states.
+ 346  */
+ 347 #define FCT_STATE_OFFLINE       0
+ 348 #define FCT_STATE_ONLINING      1
+ 349 #define FCT_STATE_ONLINE        2
+ 350 #define FCT_STATE_OFFLINING     3
+ 351 
+ 352 /*
+ 353  * fct ctl commands. These should not conflict with stmf ctl commands
+ 354  */
+ 355 #define FCT_CMD_PORT_ONLINE             (STMF_LPORT_CTL_CMDS | 0x01)
+ 356 #define FCT_CMD_PORT_ONLINE_COMPLETE    (STMF_LPORT_CTL_CMDS | 0x02)
+ 357 #define FCT_CMD_PORT_OFFLINE            (STMF_LPORT_CTL_CMDS | 0x03)
+ 358 #define FCT_CMD_PORT_OFFLINE_COMPLETE   (STMF_LPORT_CTL_CMDS | 0x04)
+ 359 #define FCT_ACK_PORT_ONLINE_COMPLETE    (STMF_LPORT_CTL_CMDS | 0x05)
+ 360 #define FCT_ACK_PORT_OFFLINE_COMPLETE   (STMF_LPORT_CTL_CMDS | 0x06)
+ 361 #define FCT_CMD_FORCE_LIP               (STMF_LPORT_CTL_CMDS | 0x07)
+ 362 
+ 363 /*
+ 364  * IO flags for cmd flow.
+ 365  */
+ 366 #define FCT_IOF_FCA_DONE                0x10000
+ 367 #define FCT_IOF_FORCE_FCA_DONE          0x20000
+ 368 
+ 369 /*
+ 370  * Fill CTIU preample
+ 371  */
+ 372 #ifdef  lint
+ 373 #define FCT_FILL_CTIU_PREAMPLE(x_payload, x_ctop)       _NOTE(EMPTY)
+ 374 #else
+ 375 #define FCT_FILL_CTIU_PREAMPLE(x_payload, x_ctop)       \
+ 376         do {                                            \
+<a name="1" id="anc1"></a><span class="changed"> 377                 x_payload[0] = 0x01;                    \</span>
+ 378                 x_payload[4] = 0xFC;                    \
+ 379                 x_payload[5] = 0x02;                    \
+ 380                 x_payload[8] = 0xFF &amp; (x_ctop &gt;&gt; 8);  \
+ 381                 x_payload[9] = 0xFF &amp; (x_ctop);             \
+ 382         } while (0)
+ 383 #endif
+ 384 
+ 385 uint64_t fct_netbuf_to_value(uint8_t *buf, uint8_t nbytes);
+ 386 void fct_value_to_netbuf(uint64_t value, uint8_t *buf, uint8_t nbytes);
+ 387 void *fct_alloc(fct_struct_id_t struct_id, int additional_size, int flags);
+ 388 void fct_free(void *ptr);
+ 389 fct_cmd_t *fct_scsi_task_alloc(struct fct_local_port *port,
+ 390     uint16_t rp_handle, uint32_t rportid, uint8_t *lun,
+ 391     uint16_t cdb_length, uint16_t task_ext);
+ 392 fct_status_t fct_register_local_port(fct_local_port_t *port);
+ 393 fct_status_t fct_deregister_local_port(fct_local_port_t *port);
+ 394 void fct_handle_event(fct_local_port_t *port, int event_id,
+ 395     uint32_t event_flags, caddr_t arg);
+ 396 void fct_post_rcvd_cmd(fct_cmd_t *cmd, stmf_data_buf_t *dbuf);
+ 397 void fct_queue_cmd_for_termination(fct_cmd_t *cmd, fct_status_t s);
+ 398 void fct_queue_scsi_task_for_termination(fct_cmd_t *cmd, fct_status_t s);
+ 399 fct_cmd_t *fct_handle_to_cmd(fct_local_port_t *port, uint32_t fct_handle);
+ 400 void fct_ctl(struct stmf_local_port *lport, int cmd, void *arg);
+ 401 void fct_cmd_fca_aborted(fct_cmd_t *cmd, fct_status_t s, uint32_t ioflags);
+ 402 uint16_t fct_get_rp_handle(fct_local_port_t *port, uint32_t rportid);
+ 403 void fct_send_response_done(fct_cmd_t *cmd, fct_status_t s, uint32_t ioflags);
+ 404 void fct_send_cmd_done(fct_cmd_t *cmd, fct_status_t s, uint32_t ioflags);
+ 405 void fct_scsi_data_xfer_done(fct_cmd_t *cmd, stmf_data_buf_t *dbuf,
+ 406     uint32_t ioflags);
+ 407 fct_status_t fct_port_initialize(fct_local_port_t *port, uint32_t rflags,
+ 408     char *additional_info);
+ 409 fct_status_t fct_port_shutdown(fct_local_port_t *port, uint32_t rflags,
+ 410     char *additional_info);
+ 411 fct_status_t fct_handle_rcvd_flogi(fct_local_port_t *port,
+ 412     fct_flogi_xchg_t *fx);
+ 413 void fct_log_local_port_event(fct_local_port_t *port, char *subclass);
+ 414 void fct_log_remote_port_event(fct_local_port_t *port, char *subclass,
+ 415     uint8_t *rp_pwwn, uint32_t rp_id);
+ 416 void fct_wwn_to_str(char *to_ptr, const uint8_t *from_ptr);
+ 417 
+ 418 #ifdef  __cplusplus
+ 419 }
+ 420 #endif
+ 421 
+ 422 #endif /* _FCT_H */
+<a name="2" id="anc2"></a><b style="font-size: large; color: red">--- EOF ---</b>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre><form name="eof"><input name="value" value="2" type="hidden"></input></form></body></html>

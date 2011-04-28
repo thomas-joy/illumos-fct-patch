@@ -1,0 +1,11 @@
+--- old/usr/src/uts/common/sys/fct.h	Thu Apr 28 06:28:11 2011
++++ new/usr/src/uts/common/sys/fct.h	Thu Apr 28 06:28:10 2011
+@@ -374,7 +374,7 @@
+ #else
+ #define	FCT_FILL_CTIU_PREAMPLE(x_payload, x_ctop)	\
+ 	do {						\
+-		x_payload[0] = 0x02;			\
++		x_payload[0] = 0x01;			\
+ 		x_payload[4] = 0xFC;			\
+ 		x_payload[5] = 0x02;			\
+ 		x_payload[8] = 0xFF & (x_ctop >> 8);	\

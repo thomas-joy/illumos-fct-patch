@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="cache-control" content="no-cache"></meta>
+<meta http-equiv="Pragma" content="no-cache"></meta>
+<meta http-equiv="Expires" content="-1"></meta>
+<!--
+   Note to customizers: the body of the webrev is IDed as SUNWwebrev
+   to allow easy overriding by users of webrev via the userContent.css
+   mechanism available in some browsers.
+
+   For example, to have all "removed" information be red instead of
+   brown, set a rule in your userContent.css file like:
+
+       body#SUNWwebrev span.removed { color: red ! important; }
+-->
+<style type="text/css" media="screen">
+body {
+    background-color: #eeeeee;
+}
+hr {
+    border: none 0;
+    border-top: 1px solid #aaa;
+    height: 1px;
+}
+div.summary {
+    font-size: .8em;
+    border-bottom: 1px solid #aaa;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+div.summary h2 {
+    margin-bottom: 0.3em;
+}
+div.summary table th {
+    text-align: right;
+    vertical-align: top;
+    white-space: nowrap;
+}
+span.lineschanged {
+    font-size: 0.7em;
+}
+span.oldmarker {
+    color: red;
+    font-size: large;
+    font-weight: bold;
+}
+span.newmarker {
+    color: green;
+    font-size: large;
+    font-weight: bold;
+}
+span.removed {
+    color: brown;
+}
+span.changed {
+    color: blue;
+}
+span.new {
+    color: blue;
+    font-weight: bold;
+}
+span.chmod {
+    font-size: 0.7em;
+    color: #db7800;
+}
+a.print { font-size: x-small; }
+a:hover { background-color: #ffcc99; }
+</style>
+
+<style type="text/css" media="print">
+pre { font-size: 0.8em; font-family: courier, monospace; }
+span.removed { color: #444; font-style: italic }
+span.changed { font-weight: bold; }
+span.new { font-weight: bold; }
+span.newmarker { font-size: 1.2em; font-weight: bold; }
+span.oldmarker { font-size: 1.2em; font-weight: bold; }
+a.print {display: none}
+hr { border: none 0; border-top: 1px solid #aaa; height: 1px; }
+</style>
+
+<title>illumos-gate Sdiff usr/src/uts/common/sys/fct.h</title>
+</head><body id="SUNWwebrev">
+<a class="print" href="javascript:print()">Print this page</a>
+<pre>*** NO COMMENTS ***</pre>
+
+<table><tr valign="top">
+<td><pre>
+
+</pre><hr></hr><pre>
+ 357 #define FCT_CMD_PORT_OFFLINE            (STMF_LPORT_CTL_CMDS | 0x03)
+ 358 #define FCT_CMD_PORT_OFFLINE_COMPLETE   (STMF_LPORT_CTL_CMDS | 0x04)
+ 359 #define FCT_ACK_PORT_ONLINE_COMPLETE    (STMF_LPORT_CTL_CMDS | 0x05)
+ 360 #define FCT_ACK_PORT_OFFLINE_COMPLETE   (STMF_LPORT_CTL_CMDS | 0x06)
+ 361 #define FCT_CMD_FORCE_LIP               (STMF_LPORT_CTL_CMDS | 0x07)
+ 362 
+ 363 /*
+ 364  * IO flags for cmd flow.
+ 365  */
+ 366 #define FCT_IOF_FCA_DONE                0x10000
+ 367 #define FCT_IOF_FORCE_FCA_DONE          0x20000
+ 368 
+ 369 /*
+ 370  * Fill CTIU preample
+ 371  */
+ 372 #ifdef  lint
+ 373 #define FCT_FILL_CTIU_PREAMPLE(x_payload, x_ctop)       _NOTE(EMPTY)
+ 374 #else
+ 375 #define FCT_FILL_CTIU_PREAMPLE(x_payload, x_ctop)       \
+ 376         do {                                            \
+<span class="changed"> 377                 x_payload[0] = 0x02;                    \</span>
+ 378                 x_payload[4] = 0xFC;                    \
+ 379                 x_payload[5] = 0x02;                    \
+ 380                 x_payload[8] = 0xFF &amp; (x_ctop &gt;&gt; 8);  \
+ 381                 x_payload[9] = 0xFF &amp; (x_ctop);             \
+ 382         } while (0)
+ 383 #endif
+ 384 
+ 385 uint64_t fct_netbuf_to_value(uint8_t *buf, uint8_t nbytes);
+ 386 void fct_value_to_netbuf(uint64_t value, uint8_t *buf, uint8_t nbytes);
+ 387 void *fct_alloc(fct_struct_id_t struct_id, int additional_size, int flags);
+ 388 void fct_free(void *ptr);
+ 389 fct_cmd_t *fct_scsi_task_alloc(struct fct_local_port *port,
+ 390     uint16_t rp_handle, uint32_t rportid, uint8_t *lun,
+ 391     uint16_t cdb_length, uint16_t task_ext);
+ 392 fct_status_t fct_register_local_port(fct_local_port_t *port);
+ 393 fct_status_t fct_deregister_local_port(fct_local_port_t *port);
+ 394 void fct_handle_event(fct_local_port_t *port, int event_id,
+ 395     uint32_t event_flags, caddr_t arg);
+ 396 void fct_post_rcvd_cmd(fct_cmd_t *cmd, stmf_data_buf_t *dbuf);
+ 397 void fct_queue_cmd_for_termination(fct_cmd_t *cmd, fct_status_t s);
+
+</pre><hr></hr>
+</pre></td><td><pre>
+
+</pre><hr></hr><pre>
+ 357 #define FCT_CMD_PORT_OFFLINE            (STMF_LPORT_CTL_CMDS | 0x03)
+ 358 #define FCT_CMD_PORT_OFFLINE_COMPLETE   (STMF_LPORT_CTL_CMDS | 0x04)
+ 359 #define FCT_ACK_PORT_ONLINE_COMPLETE    (STMF_LPORT_CTL_CMDS | 0x05)
+ 360 #define FCT_ACK_PORT_OFFLINE_COMPLETE   (STMF_LPORT_CTL_CMDS | 0x06)
+ 361 #define FCT_CMD_FORCE_LIP               (STMF_LPORT_CTL_CMDS | 0x07)
+ 362 
+ 363 /*
+ 364  * IO flags for cmd flow.
+ 365  */
+ 366 #define FCT_IOF_FCA_DONE                0x10000
+ 367 #define FCT_IOF_FORCE_FCA_DONE          0x20000
+ 368 
+ 369 /*
+ 370  * Fill CTIU preample
+ 371  */
+ 372 #ifdef  lint
+ 373 #define FCT_FILL_CTIU_PREAMPLE(x_payload, x_ctop)       _NOTE(EMPTY)
+ 374 #else
+ 375 #define FCT_FILL_CTIU_PREAMPLE(x_payload, x_ctop)       \
+ 376         do {                                            \
+<span class="changed"> 377                 x_payload[0] = 0x01;                    \</span>
+ 378                 x_payload[4] = 0xFC;                    \
+ 379                 x_payload[5] = 0x02;                    \
+ 380                 x_payload[8] = 0xFF &amp; (x_ctop &gt;&gt; 8);  \
+ 381                 x_payload[9] = 0xFF &amp; (x_ctop);             \
+ 382         } while (0)
+ 383 #endif
+ 384 
+ 385 uint64_t fct_netbuf_to_value(uint8_t *buf, uint8_t nbytes);
+ 386 void fct_value_to_netbuf(uint64_t value, uint8_t *buf, uint8_t nbytes);
+ 387 void *fct_alloc(fct_struct_id_t struct_id, int additional_size, int flags);
+ 388 void fct_free(void *ptr);
+ 389 fct_cmd_t *fct_scsi_task_alloc(struct fct_local_port *port,
+ 390     uint16_t rp_handle, uint32_t rportid, uint8_t *lun,
+ 391     uint16_t cdb_length, uint16_t task_ext);
+ 392 fct_status_t fct_register_local_port(fct_local_port_t *port);
+ 393 fct_status_t fct_deregister_local_port(fct_local_port_t *port);
+ 394 void fct_handle_event(fct_local_port_t *port, int event_id,
+ 395     uint32_t event_flags, caddr_t arg);
+ 396 void fct_post_rcvd_cmd(fct_cmd_t *cmd, stmf_data_buf_t *dbuf);
+ 397 void fct_queue_cmd_for_termination(fct_cmd_t *cmd, fct_status_t s);
+
+</pre><hr></hr>
+</pre></td>
+</tr></table>
+</body></html>
